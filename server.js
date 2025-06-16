@@ -40,9 +40,10 @@ console.log(_.isString(false));*/
 const express = require('express') ;
 
 const app = express();
-const db = require('./db');
+
 const menueItems = require('./models/menueItems');
 const PORT = process.env.PORT || 3000 ;
+connectToDatabase(app);
 require('dotenv').config();
 
 const bodyParser= require('body-parser');
