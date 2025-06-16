@@ -1,39 +1,23 @@
 const mongoose = require('mongoose');
 require('dotenv').config();
 
-const mongoUrl = process.env.DB_URL; // Make sure this key is correct
+//const mongoUrl = process.env.DB_URL_Local;
+const mongoUrl = process.env.DB_URL;
 
-// Optional config to prevent timeout errors
-const options = {
-  serverSelectionTimeoutMS: 30000, // wait up to 30s for connection
-};
-
-// Connect to MongoDB
-function connectToDatabase(app) {
-  mongoose.connect(mongoUrl, options)
-    .then(() => {
-      console.log('✅ Connected to MongoDB');
-
-      // Start the Express server **after DB connection**
-      const PORT = process.env.PORT || 3000;
-      app.listen(PORT, () => {
-        console.log(`🚀 Server is running on port ${PORT}`);
-      });
-    })
-    .catch((err) => {
-      console.error('❌ MongoDB connection error:', err.message);
-      process.exit(1); // Exit if connection fails
-    });
-
-  const db = mongoose.connection;
-
-  db.on('disconnected', () => {
-    console.warn('⚠️ Disconnected from MongoDB');
+// Remove deprecated options
+mongoose.connect(mongoUrl)
+  .then(() => {
+    console.log(' Connected to MongoDB');
+  })
+  .catch((err) => {
+    console.error(' MongoDB connection error:', err);
   });
 
-  db.on('error', (err) => {
-    console.error('❌ MongoDB error:', err.message);
-  });
-}
+const db = mongoose.connection;
 
-module.exports = connectToDatabase;
+// Optional: still listen for disconnection if you want
+db.on('disconnected', () => {
+  console.log(' Disconnected from MongoDB');
+});
+
+module.exports = db;
