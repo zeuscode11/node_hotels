@@ -43,24 +43,53 @@ const app = express();
 const db = require('./db');
 const menueItems = require('./models/menueItems');
 const PORT = process.env.PORT || 3000;
+const passport = require('./auth');
+
+
+// for making and applying .env file
 require('dotenv').config();
 
 const bodyParser= require('body-parser');
 app.use(bodyParser.json());
 
 
-app.get('/', (req, res) => {
-  res.send('Hello World')
-})
+
+// Middleware function for logging time
+const logRequest = (req,res,next)=>{
+  console.log(`[${new Date().toLocaleString()}]Request Made to : ${req.originalUrl}`);
+  next();//move to the Next Phase 
+}
+ 
+
+
+//to use log request in all methodes like get./person ,put./menue
+app.use(logRequest);
+
+
+//authenticating process
+app.use(passport.initialize());
+
+//abb neeche wali line ma function banao  passport.authenticate('local',{session:false})dalna hoga
+const LocalAuthMiddleware = passport.authenticate('local',{session:false})
+
+
+
 
 // import router file
 const personRoutes = require('./routes/personRoutes');
 //use the router
 app.use('/person',personRoutes);
 
-const menueRoutes = require('./routes/menueRoutes');
 
+const menueRoutes = require('./routes/menueRoutes');
 app.use('/menueItems',menueRoutes);
+
+
+//Normal get methode / we did in the Begining  
+app.get('/',function (req, res) {
+  res.send('Hello World')
+})
+
 
 app.listen(3000,()=>{
   console.log("server is running on port 3000");
